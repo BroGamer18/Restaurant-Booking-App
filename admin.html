@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mixy Restaurant · Command Center</title>
+    <!-- Google Fonts + Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #FDF9F2;
+            color: #2C2C2C;
+        }
+        h1, h2, h3, .logo { font-family: 'Playfair Display', serif; }
+        /* glassmorphism premium */
+        .glass-panel {
+            background: rgba(255, 248, 231, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 36px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
+            padding: 2rem;
+        }
+        nav {
+            background: #2C2C2C;
+            padding: 1rem 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 4px solid #D4AF37;
+        }
+        .logo { font-size: 2.2rem; color: #D4AF37; letter-spacing: 1px; }
+        .nav-link { color: #FFF8E7; text-decoration: none; font-weight: 500; }
+        .container { max-width: 1600px; margin: 2rem auto; padding: 0 5%; }
+        .login-card { max-width: 420px; margin: 6rem auto; }
+        .input-group { margin-bottom: 1.8rem; }
+        .input-group label {
+            color: #8B0000; font-weight: 600; display: block; margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        .input-group input, .input-group select {
+            width: 100%; padding: 1rem 1.2rem; border-radius: 50px;
+            border: 1px solid #D4AF37; background: #FFF8E7; font-size: 1rem;
+            outline: none;
+        }
+        .input-group input:focus { border-color: #8B0000; box-shadow: 0 0 0 3px rgba(212,175,55,0.3); }
+        .btn {
+            background: #8B0000; border: none; padding: 1rem 2.2rem; border-radius: 60px;
+            color: #FFF8E7; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+            border: 1px solid #D4AF37; transition: all 0.2s;
+        }
+        .btn-gold { background: #D4AF37; color: #2C2C2C; }
+        .btn:hover { transform: scale(1.02) translateY(-3px); background: #a00000; box-shadow: 0 16px 30px #8B0000; }
+        .btn-gold:hover { background: #e5c04f; }
+        .error { color: #8B0000; font-size: 0.9rem; margin-top: 0.3rem; }
+        .dashboard-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .stat-card {
+            background: rgba(212, 175, 55, 0.15);
+            border-radius: 30px; padding: 1.5rem 0.5rem; text-align: center;
+            border: 1px solid #D4AF37;
+        }
+        .stat-number { font-size: 2.8rem; font-weight: 700; color: #8B0000; line-height: 1.2; }
+        .stat-label { font-weight: 500; color: #2C2C2C; }
+        .search-section {
+            display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
+            background: rgba(212,175,55,0.1); padding: 1.5rem; border-radius: 60px;
+            margin: 1.8rem 0;
+        }
+        .search-section input, .search-section select {
+            padding: 0.9rem 1.5rem; border-radius: 40px; border: 1px solid #D4AF37;
+            background: #FFF8E7; flex: 1 1 200px;
+        }
+        .badge {
+            background: #8B0000; color: #FFF8E7; padding: 0.5rem 1.8rem;
+            border-radius: 40px; font-weight: 600; border: 1px solid #D4AF37;
+        }
+        .table-responsive {
+            overflow-x: auto; border-radius: 32px; background: rgba(255,248,231,0.5);
+            margin-top: 1.5rem;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: #8B0000; color: #FFF8E7; padding: 1rem; font-weight: 600;
+            position: sticky; top: 0;
+        }
+        td { padding: 1rem; border-bottom: 1px solid #D4AF37; }
+        .delete-btn {
+            background: #8B0000; color: white; border: none; padding: 0.4rem 1.2rem;
+            border-radius: 30px; cursor: pointer; font-weight: 600;
+            transition: 0.2s;
+        }
+        .delete-btn:hover { background: #2C2C2C; color: #D4AF37; }
+        .edit-btn {
+            background: #D4AF37; color: #2C2C2C; border: none; padding: 0.4rem 1rem;
+            border-radius: 30px; cursor: pointer; margin-right: 0.5rem;
+        }
+        .hidden { display: none !important; }
+        .spinner {
+            border: 4px solid rgba(212,175,55,0.2); border-top: 4px solid #8B0000;
+            border-radius: 50%; width: 3rem; height: 3rem; animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .toast {
+            position: fixed; top: 30px; right: 30px; background: #8B0000; color: #FFF8E7;
+            padding: 1rem 2rem; border-radius: 60px; box-shadow: 0 10px 30px #8B0000;
+            z-index: 999; border-left: 8px solid #D4AF37;
+            transition: 0.3s;
+        }
+        .export-btn { background: #2C2C2C; color: #D4AF37; margin-left: auto; }
+        .analytics-row {
+            display: flex; gap: 2rem; flex-wrap: wrap; margin: 1.5rem 0;
+        }
+        .quick-note {
+            background: #D4AF37; color: #2C2C2C; border-radius: 40px; padding: 0.5rem 2rem;
+            font-weight: 600;
+        }
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #FFF8E7; border-radius: 48px; max-width: 500px; width: 90%;
+            padding: 2.5rem; border: 2px solid #D4AF37;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <span class="logo">Mixy · Admin+</span>
+        <a href="index.html" class="nav-link" target="_blank"><i class="fas fa-external-link-alt"></i> view site</a>
+    </nav>
+
+    <div class="container">
+        <!-- LOGIN MODULE -->
+        <div id="loginPanel" class="glass-panel login-card">
+            <h2 style="color: #8B0000; margin-bottom: 1.8rem;"><i class="fas fa-lock"></i> secure entry</h2>
+            <div class="input-group">
+                <label><i class="fas fa-key"></i> master password</label>
+                <div style="display: flex; align-items: center;">
+                    <input type="password" id="adminPass" placeholder="••••••••" style="flex:1;">
+                    <button type="button" id="togglePass" style="background:none; border:none; margin-left: -40px; cursor:pointer;"><i class="fas fa-eye"></i></button>
+                </div>
+                <div class="error" id="adminError"></div>
+            </div>
+            <button id="adminLoginBtn" class="btn" style="width:100%;"><i class="fas fa-sign-in-alt"></i> access command center</button>
+            <p style="margin-top: 1.5rem; text-align: center; background: rgba(212,175,55,0.2); padding: 0.8rem; border-radius: 40px;">🔑 <strong>Use Correct Password</strong></p>
+        </div>
+
+        <!-- DASHBOARD (hidden until auth) -->
+        <div id="dashboardPanel" class="glass-panel hidden">
+            <!-- header with live clock & logout -->
+            <div class="dashboard-header">
+                <h2 style="color:#8B0000;"><i class="fas fa-chart-pie"></i> Mixy live dashboard</h2>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span class="quick-note" id="liveClock"></span>
+                    <button id="logoutBtn" class="btn-gold btn"><i class="fas fa-power-off"></i> logout</button>
+                </div>
+            </div>
+
+            <!-- STATS CARDS (new) -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card"><div class="stat-number" id="totalBookings">0</div><div class="stat-label">total reservations</div></div>
+                <div class="stat-card"><div class="stat-number" id="todayBookings">0</div><div class="stat-label">booked today</div></div>
+                <div class="stat-card"><div class="stat-number" id="guestSum">0</div><div class="stat-label">total guests</div></div>
+                <div class="stat-card"><div class="stat-number" id="uniqueDates">0</div><div class="stat-label">active dates</div></div>
+            </div>
+
+            <!-- SEARCH & FILTER + EXPORT (improved) -->
+            <div class="search-section">
+                <input type="text" id="searchInput" placeholder="🔍 search by name, email, phone, id...">
+                <input type="date" id="filterDate">
+                <select id="guestsFilter">
+                    <option value="">any guests</option>
+                    <option value="1">1 guest</option><option value="2">2 guests</option><option value="3">3</option>
+                    <option value="4">4</option><option value="5">5</option><option value="6">6+</option>
+                </select>
+                <button id="exportCsvBtn" class="btn export-btn"><i class="fas fa-download"></i> CSV</button>
+                <span class="badge" id="bookingCount">0</span>
+            </div>
+
+            <!-- QUICK ACTIONS (new) -->
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin: 0 0 1rem;">
+                <button id="refreshBtn" class="btn-gold btn" style="padding: 0.7rem 2rem;"><i class="fas fa-sync-alt"></i> sync now</button>
+                <button id="clearDateFilter" class="btn" style="padding: 0.7rem 2rem; background: #2C2C2C;">clear date filter</button>
+            </div>
+
+            <!-- BOOKINGS TABLE (with loading spinner) -->
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>name</th><th>phone</th><th>email</th><th>date</th><th>time</th>
+                            <th>guests</th><th>requests</th><th>booked at</th><th>actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTbody"></tbody>
+                </table>
+                <div id="tableSpinner" class="spinner hidden"></div>
+                <div id="tableEmpty" style="text-align: center; padding: 2.5rem; display: none;">✨ no bookings match your filters</div>
+            </div>
+
+            <!-- BULK DELETE / NOTE (extra) -->
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+                <button id="deleteOld30Btn" class="btn" style="background:#2C2C2C;"><i class="fas fa-trash-alt"></i> delete older than 30d</button>
+                <span id="lastUpdate" style="color:#8B0000; margin-left: auto;">🕒 updated just now</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL (hidden) -->
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 style="color:#8B0000; margin-bottom:1rem;"><i class="fas fa-user-edit"></i> edit reservation</h3>
+            <div class="input-group"><label>Name</label><input type="text" id="editName"></div>
+            <div class="input-group"><label>Phone</label><input type="text" id="editPhone"></div>
+            <div class="input-group"><label>Email</label><input type="email" id="editEmail"></div>
+            <div class="input-group"><label>Date</label><input type="date" id="editDate"></div>
+            <div class="input-group"><label>Time</label><select id="editTime"><?php for($h=12;$h<=23;$h++): ?><option value="<?php echo str_pad($h,2,'0',STR_PAD_LEFT).':00'?>"><?php echo $h>12?$h-12:$h;?>:00 <?php echo $h>=12?'PM':'AM'?></option><?php endfor;?></select></div>
+            <div class="input-group"><label>Guests</label><input type="number" id="editGuests" min="1" max="10"></div>
+            <div class="input-group"><label>Requests</label><textarea id="editRequests" rows="2"></textarea></div>
+            <input type="hidden" id="editKey">
+            <div style="display:flex; gap:1rem; justify-content:end; margin-top:2rem;">
+                <button id="cancelEdit" class="btn-gold btn">cancel</button>
+                <button id="saveEdit" class="btn">save changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- toast container -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module">
+        // --- Firebase modular SDK (v10) ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, onValue, remove, set, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB4MBKa6BeRK0OHoiA6Xy2kDACDJSOr-dY",
+            authDomain: "restaurant-booking-app-94498.firebaseapp.com",
+            databaseURL: "https://restaurant-booking-app-94498-default-rtdb.firebaseio.com",
+            projectId: "restaurant-booking-app-94498",
+            storageBucket: "restaurant-booking-app-94498.firebasestorage.app",
+            messagingSenderId: "882895057555",
+            appId: "1:882895057555:web:2bed27cd7b99488b285366"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const bookingsRef = ref(database, "bookings");
+
+        // --- DOM ---
+        const loginPanel = document.getElementById('loginPanel');
+        const dashboardPanel = document.getElementById('dashboardPanel');
+        const adminPassInp = document.getElementById('adminPass');
+        const adminError = document.getElementById('adminError');
+        const loginBtn = document.getElementById('adminLoginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const togglePass = document.getElementById('togglePass');
+        const bookingsTbody = document.getElementById('bookingsTbody');
+        const bookingCountSpan = document.getElementById('bookingCount');
+        const searchInput = document.getElementById('searchInput');
+        const filterDate = document.getElementById('filterDate');
+        const guestsFilter = document.getElementById('guestsFilter');
+        const tableSpinner = document.getElementById('tableSpinner');
+        const tableEmpty = document.getElementById('tableEmpty');
+        const exportBtn = document.getElementById('exportCsvBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const clearDateBtn = document.getElementById('clearDateFilter');
+        const deleteOld30Btn = document.getElementById('deleteOld30Btn');
+        const liveClock = document.getElementById('liveClock');
+        const lastUpdateSpan = document.getElementById('lastUpdate');
+        const toast = document.getElementById('toast');
+        // stats elements
+        const totalBookingsSpan = document.getElementById('totalBookings');
+        const todayBookingsSpan = document.getElementById('todayBookings');
+        const guestSumSpan = document.getElementById('guestSum');
+        const uniqueDatesSpan = document.getElementById('uniqueDates');
+
+        // modal elements
+        const editModal = document.getElementById('editModal');
+        const editName = document.getElementById('editName');
+        const editPhone = document.getElementById('editPhone');
+        const editEmail = document.getElementById('editEmail');
+        const editDate = document.getElementById('editDate');
+        const editTime = document.getElementById('editTime');
+        const editGuests = document.getElementById('editGuests');
+        const editRequests = document.getElementById('editRequests');
+        const editKey = document.getElementById('editKey');
+        const cancelEdit = document.getElementById('cancelEdit');
+        const saveEdit = document.getElementById('saveEdit');
+
+        const ADMIN_PASSWORD = "Admin@123";
+        let allBookings = [];
+        let realtimeUnsub = null;
+
+        // --- helpers ---
+        function showToast(msg, duration = 3000) {
+            toast.textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), duration);
+        }
+
+        function updateClock() {
+    		const now = new Date();
+
+    		const formattedTime = now.toLocaleTimeString('en-US', {
+        		hour: 'numeric',
+        		minute: '2-digit',
+        		hour12: true
+    		});
+
+    		liveClock.textContent = formattedTime;
+	}
+        setInterval(updateClock, 1000);
+
+        // password toggle
+        togglePass.addEventListener('click', () => {
+            if (adminPassInp.type === 'password') {
+                adminPassInp.type = 'text';
+                togglePass.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                adminPassInp.type = 'password';
+                togglePass.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        });
+
+        // login
+        loginBtn.addEventListener('click', () => {
+            if (adminPassInp.value === ADMIN_PASSWORD) {
+                loginPanel.classList.add('hidden');
+                dashboardPanel.classList.remove('hidden');
+                adminError.textContent = '';
+                loadRealtimeBookings();
+                showToast('✅ access granted');
+            } else {
+                adminError.textContent = 'incorrect password';
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            if (realtimeUnsub) realtimeUnsub();
+            dashboardPanel.classList.add('hidden');
+            loginPanel.classList.remove('hidden');
+            adminPassInp.value = '';
+            allBookings = [];
+        });
+
+        // real-time listener
+        function loadRealtimeBookings() {
+            tableSpinner.classList.remove('hidden');
+            realtimeUnsub = onValue(bookingsRef, (snapshot) => {
+                const data = snapshot.val();
+                allBookings = [];
+                if (data) {
+                    allBookings = Object.entries(data).map(([key, val]) => ({ key, ...val }));
+                }
+                tableSpinner.classList.add('hidden');
+                filterAndRender();
+                updateStats();
+                lastUpdateSpan.textContent = `🕒 last update: ${new Date().toLocaleTimeString()}`;
+            });
+        }
+
+        // filter logic
+        function filterAndRender() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const dateFilter = filterDate.value;
+            const guestFilter = guestsFilter.value;
+
+            let filtered = allBookings.filter(b => {
+                const searchMatch = 
+                    b.name?.toLowerCase().includes(searchTerm) ||
+                    b.email?.toLowerCase().includes(searchTerm) ||
+                    b.phone?.includes(searchTerm) ||
+                    b.key?.toLowerCase().includes(searchTerm);
+                const dateMatch = dateFilter ? b.date === dateFilter : true;
+                let guestMatch = true;
+                if (guestFilter === '6+') guestMatch = parseInt(b.guests) >= 6;
+                else if (guestFilter) guestMatch = b.guests === guestFilter;
+                return searchMatch && dateMatch && guestMatch;
+            });
+
+            bookingCountSpan.textContent = `${filtered.length} booking${filtered.length!==1?'s':''}`;
+            renderTable(filtered);
+            if (filtered.length === 0) tableEmpty.style.display = 'block';
+            else tableEmpty.style.display = 'none';
+        }
+
+        // render table with edit/delete
+        function renderTable(bookings) {
+            bookingsTbody.innerHTML = '';
+            bookings.forEach(b => {
+                const row = document.createElement('tr');
+                const shortId = b.key ? b.key.slice(0,5)+'…' : '—';
+                const ts = b.timestamp ? new Date(b.timestamp).toLocaleString() : '';
+                row.innerHTML = `
+                    <td>${shortId}</td><td>${b.name || ''}</td><td>${b.phone || ''}</td><td>${b.email || ''}</td>
+                    <td>${b.date || ''}</td><td>${b.time || ''}</td><td>${b.guests || ''}</td><td>${b.requests || ''}</td>
+                    <td>${ts}</td>
+                    <td>
+                        <button class="edit-btn" data-key="${b.key}" data-name="${b.name}" data-phone="${b.phone}" data-email="${b.email}" data-date="${b.date}" data-time="${b.time}" data-guests="${b.guests}" data-requests="${b.requests}"><i class="fas fa-pen"></i></button>
+                        <button class="delete-btn" data-key="${b.key}"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                bookingsTbody.appendChild(row);
+            });
+
+            // delete handlers
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const key = e.currentTarget.dataset.key;
+                    if (key && confirm('Delete this reservation?')) {
+                        await remove(ref(database, 'bookings/' + key));
+                        showToast('❌ booking removed');
+                    }
+                });
+            });
+
+            // edit handlers -> open modal
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const dataset = e.currentTarget.dataset;
+                    editKey.value = dataset.key;
+                    editName.value = dataset.name || '';
+                    editPhone.value = dataset.phone || '';
+                    editEmail.value = dataset.email || '';
+                    editDate.value = dataset.date || '';
+                    editTime.value = dataset.time || '';
+                    editGuests.value = dataset.guests || '1';
+                    editRequests.value = dataset.requests || '';
+                    editModal.classList.remove('hidden');
+                });
+            });
+        }
+
+        // save edited booking
+        saveEdit.addEventListener('click', async () => {
+            const key = editKey.value;
+            if (!key) return;
+            const updated = {
+                name: editName.value,
+                phone: editPhone.value,
+                email: editEmail.value,
+                date: editDate.value,
+                time: editTime.value,
+                guests: editGuests.value,
+                requests: editRequests.value,
+                timestamp: new Date().toISOString()  // refresh timestamp
+            };
+            await update(ref(database, `bookings/${key}`), updated);
+            editModal.classList.add('hidden');
+            showToast('✏️ booking updated');
+        });
+
+        cancelEdit.addEventListener('click', () => editModal.classList.add('hidden'));
+
+        // stats calculation
+        function updateStats() {
+            totalBookingsSpan.textContent = allBookings.length;
+            const today = new Date().toISOString().split('T')[0];
+            const todayCount = allBookings.filter(b => b.date === today).length;
+            todayBookingsSpan.textContent = todayCount;
+
+            const totalGuests = allBookings.reduce((acc, b) => acc + (parseInt(b.guests) || 0), 0);
+            guestSumSpan.textContent = totalGuests;
+
+            const unique = new Set(allBookings.map(b => b.date)).size;
+            uniqueDatesSpan.textContent = unique;
+        }
+
+        // export CSV
+        exportBtn.addEventListener('click', () => {
+            let csv = "ID,Name,Phone,Email,Date,Time,Guests,Requests,Timestamp\n";
+            allBookings.forEach(b => {
+                csv += `"${b.key}","${b.name}","${b.phone}","${b.email}","${b.date}","${b.time}","${b.guests}","${b.requests}","${b.timestamp}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `mixy_bookings_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click(); URL.revokeObjectURL(url);
+            showToast('📥 CSV exported');
+        });
+
+        // delete older than 30 days
+        deleteOld30Btn.addEventListener('click', async () => {
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const cutoff = thirtyDaysAgo.toISOString();
+            const toDelete = allBookings.filter(b => b.timestamp && b.timestamp < cutoff);
+            if (toDelete.length === 0) return alert('no bookings older than 30d');
+            if (!confirm(`Delete ${toDelete.length} old bookings?`)) return;
+            for (let b of toDelete) {
+                await remove(ref(database, 'bookings/' + b.key));
+            }
+            showToast(`🧹 removed ${toDelete.length} old entries`);
+        });
+
+        // refresh / re-subscribe
+        refreshBtn.addEventListener('click', () => {
+            if (realtimeUnsub) realtimeUnsub();
+            loadRealtimeBookings();
+        });
+
+        // filter triggers
+        searchInput.addEventListener('input', filterAndRender);
+        filterDate.addEventListener('change', filterAndRender);
+        guestsFilter.addEventListener('change', filterAndRender);
+        clearDateBtn.addEventListener('click', () => {
+            filterDate.value = '';
+            filterAndRender();
+        });
+
+        // initial clock
+        updateClock();
+    </script>
+</body>
+</html>
